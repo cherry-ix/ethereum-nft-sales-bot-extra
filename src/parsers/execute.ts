@@ -28,7 +28,12 @@ const execute = async (
     }
 
     if (txData && options.twitterConfig) {
-        await handleTweet(txData, config, options);
+        try {
+            const tweet = await handleTweet(txData, config, options);
+            txData.tweet = tweet;
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return txData;

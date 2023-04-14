@@ -2,7 +2,8 @@ import retry from 'async-retry';
 import {
     TwitterApi,
     EUploadMimeType,
-    TwitterApiReadWrite
+    TwitterApiReadWrite,
+    TweetV1
 } from 'twitter-api-v2';
 import { Logger, log } from '../Logger/index.js';
 import { formatPrice } from '../utils/helper.js';
@@ -26,7 +27,7 @@ const handleTweet = async (
     tx: TransactionData,
     config: Config,
     options: Options
-): Promise<void> => {
+): Promise<TweetV1> => {
     if (!options.twitterConfig) {
         throw log.throwError(
             'No Twitter config',
@@ -39,11 +40,11 @@ const handleTweet = async (
     const client = new TwitterApi(options.twitterConfig);
 
     if (tx.swap) {
-        await sendSwapTweet(tx, config, client, options.twitterConfig);
+        return await sendSwapTweet(tx, config, client, options.twitterConfig);
     } else if (tx.totalAmount > 1) {
-        await sendSweepTweet(tx, client, options.twitterConfig);
+        return await sendSweepTweet(tx, client, options.twitterConfig);
     } else {
-        await sendSaleTweet(tx, client, options.twitterConfig);
+        return await sendSaleTweet(tx, client, options.twitterConfig);
     }
 };
 
@@ -59,7 +60,7 @@ const sendSwapTweet = async (
     config: Config,
     client: TwitterApi,
     twitterConfig: TwitterConfig
-): Promise<void> => {
+): Promise<TweetV1> => {
     if (!tx.swap) {
         throw log.throwError('No swap data', Logger.code.MISSING_ARGUMENT, {
             location: Logger.location.TWITTER_SEND_SWAP_TWEET
@@ -87,7 +88,7 @@ ${tx.interactedMarket.accountPage}${tx.swap?.maker.address}
         mimeType: EUploadMimeType.Gif
     });
 
-    await sendTweet(content, mediaId, client.readWrite);
+    return await sendTweet(content, mediaId, client.readWrite);
 };
 
 /**
@@ -101,7 +102,7 @@ const sendSweepTweet = async (
     tx: TransactionData,
     client: TwitterApi,
     twitterConfig: TwitterConfig
-): Promise<void> => {
+): Promise<TweetV1> => {
     const titleName = tx.contractData.name || tx.contractData.symbol;
     const stolen = tx.totalPrice === 0 ? '(Possibly stolen. 🚨)' : '';
 
@@ -126,7 +127,7 @@ ${tx.interactedMarket.accountPage}${tx.toAddr}
         mimeType: EUploadMimeType.Gif
     });
 
-    await sendTweet(content, mediaId, client.readWrite);
+    return await sendTweet(content, mediaId, client.readWrite);
 };
 
 /**
@@ -140,7 +141,7 @@ const sendSaleTweet = async (
     tx: TransactionData,
     client: TwitterApi,
     twitterConfig: TwitterConfig
-): Promise<void> => {
+): Promise<TweetV1> => {
     const tokenId = Object.keys(tx.tokens)[0];
     const token = tx.tokens[tokenId];
     const isX2Y2 = tx.interactedMarket.name === 'x2y2' ? '/items' : '';
@@ -180,7 +181,7 @@ ${tx.interactedMarket.accountPage}${tx.toAddr}${isX2Y2}
         mimeType: EUploadMimeType.Png
     });
 
-    await sendTweet(content, mediaId, client.readWrite);
+    return await sendTweet(content, mediaId, client.readWrite);
 };
 
 /**
@@ -196,10 +197,10 @@ const sendTweet = async (
     content: string,
     mediaId: string,
     rwclient: TwitterApiReadWrite
-): Promise<void> => {
-    await retry(
+): Promise<TweetV1> => {
+    return await retry(
         async () => {
-            await rwclient.v1.tweet(content, {
+            return await rwclient.v1.tweet(content, {
                 media_ids: mediaId
             });
         },

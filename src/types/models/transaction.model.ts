@@ -4,6 +4,7 @@ import type {
     TokenData,
     ContractMetadata
 } from '../contracts/token.contract.js';
+import { TweetV1 } from 'twitter-api-v2';
 
 export type TransactionData = {
     swap?: Swap;
@@ -25,4 +26,5 @@ export type TransactionData = {
     fromAddr?: string;
     usdPrice?: string | null;
     transactionHash: string;
+    tweet?: TweetV1;
 };
