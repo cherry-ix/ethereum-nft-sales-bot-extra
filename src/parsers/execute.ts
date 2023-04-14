@@ -25,6 +25,7 @@ const execute = async (
 
     if (txData && options.discordWebhook) {
         await handleEmbedMessage(txData, config, options);
+        txData.discord = { webhookUrl: options.discordWebhook };
     }
 
     if (txData && options.twitterConfig) {

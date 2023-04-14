@@ -27,4 +27,5 @@ export type TransactionData = {
     usdPrice?: string | null;
     transactionHash: string;
     tweet?: TweetV1;
+    discord?: { webhookUrl: string };
 };
