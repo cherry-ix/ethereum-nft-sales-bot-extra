@@ -41,4 +41,5 @@ export interface TwitterConfig {
     appSecret: string;
     accessToken: string;
     accessSecret: string;
+    tweetWatermark: string;
 }

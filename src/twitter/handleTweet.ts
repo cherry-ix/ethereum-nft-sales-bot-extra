@@ -9,7 +9,11 @@ import { formatPrice } from '../utils/helper.js';
 import { createGif, createSwapGif, parseImage } from '../utils/image.js';
 
 import type { TransactionData } from '../types/models/transaction.model.js';
-import type { Config, Options } from '../types/interfaces/enft.interface.js';
+import type {
+    Config,
+    Options,
+    TwitterConfig
+} from '../types/interfaces/enft.interface.js';
 
 /**
  *
@@ -35,11 +39,11 @@ const handleTweet = async (
     const client = new TwitterApi(options.twitterConfig);
 
     if (tx.swap) {
-        await sendSwapTweet(tx, config, client);
+        await sendSwapTweet(tx, config, client, options.twitterConfig);
     } else if (tx.totalAmount > 1) {
-        await sendSweepTweet(tx, client);
+        await sendSweepTweet(tx, client, options.twitterConfig);
     } else {
-        await sendSaleTweet(tx, client);
+        await sendSaleTweet(tx, client, options.twitterConfig);
     }
 };
 
@@ -53,7 +57,8 @@ const handleTweet = async (
 const sendSwapTweet = async (
     tx: TransactionData,
     config: Config,
-    client: TwitterApi
+    client: TwitterApi,
+    twitterConfig: TwitterConfig
 ): Promise<void> => {
     if (!tx.swap) {
         throw log.throwError('No swap data', Logger.code.MISSING_ARGUMENT, {
@@ -72,7 +77,9 @@ ${tx.interactedMarket.accountPage}${tx.swap?.maker.address}
 Taker: ${tx.swap?.taker.name}
 ${tx.interactedMarket.accountPage}${tx.swap?.maker.address}
 
-🔍 https://etherscan.io/tx/${tx.transactionHash}
+🔍 https://etherscan.io/tx/${tx.transactionHash}${
+        twitterConfig.tweetWatermark ? `\n${twitterConfig.tweetWatermark}` : ``
+    }
         `;
 
     const gifImage = tx.gifImage ?? (await createSwapGif(tx.swap, config));
@@ -92,7 +99,8 @@ ${tx.interactedMarket.accountPage}${tx.swap?.maker.address}
  */
 const sendSweepTweet = async (
     tx: TransactionData,
-    client: TwitterApi
+    client: TwitterApi,
+    twitterConfig: TwitterConfig
 ): Promise<void> => {
     const titleName = tx.contractData.name || tx.contractData.symbol;
     const stolen = tx.totalPrice === 0 ? '(Possibly stolen. 🚨)' : '';
@@ -108,7 +116,9 @@ ${stolen}
 ${tx.isBlurBid ? 'Seller' : 'Sweeper'}: ${tx.toAddrName}
 ${tx.interactedMarket.accountPage}${tx.toAddr}
 
-🔍 https://etherscan.io/tx/${tx.transactionHash}
+🔍 https://etherscan.io/tx/${tx.transactionHash}${
+        twitterConfig.tweetWatermark ? `\n${twitterConfig.tweetWatermark}` : ``
+    }
         `;
 
     const gifImage = tx.gifImage ?? (await createGif(tx.tokens));
@@ -128,7 +138,8 @@ ${tx.interactedMarket.accountPage}${tx.toAddr}
  */
 const sendSaleTweet = async (
     tx: TransactionData,
-    client: TwitterApi
+    client: TwitterApi,
+    twitterConfig: TwitterConfig
 ): Promise<void> => {
     const tokenId = Object.keys(tx.tokens)[0];
     const token = tx.tokens[tokenId];
@@ -158,7 +169,9 @@ ${tx.interactedMarket.accountPage}${tx.toAddr}${isX2Y2}
 `
 }
 
-🔍 https://etherscan.io/tx/${tx.transactionHash}
+🔍 https://etherscan.io/tx/${tx.transactionHash}${
+        twitterConfig.tweetWatermark ? `\n${twitterConfig.tweetWatermark}` : ``
+    }
         `;
 
     const sharpImage = await parseImage(token.image);

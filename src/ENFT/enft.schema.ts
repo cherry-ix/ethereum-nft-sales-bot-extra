@@ -22,6 +22,7 @@ export default Joi.object({
         appKey: Joi.string().required(),
         appSecret: Joi.string().required(),
         accessToken: Joi.string().required(),
-        accessSecret: Joi.string().required()
+        accessSecret: Joi.string().required(),
+        tweetWatermark: Joi.string().optional()
     }).optional()
 });
