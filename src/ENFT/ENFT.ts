@@ -97,7 +97,6 @@ export class ENFT {
         opts: ClientOptions,
         callback?: Callback<TransactionData>
     ): Promise<TransactionData | null | undefined> => {
-        console.log(`debugTransaction() - ${opts.transactionHash}`);
         const { error } = enftSchema.validate(opts);
 
         if (error) {
@@ -111,13 +110,10 @@ export class ENFT {
                 location: Logger.location.ENFT_DEBUG_TRANSACTION
             });
         }
-        console.log(`running init()`);
         const { config, options } = await this.init(opts);
 
         if (!opts.test) Logger.consoleLog(this.auth, config, options);
-        console.log(`getting txData (execute())`);
         const txData = await execute(config, opts.transactionHash, options);
-        console.log(`txData`, txData);
 
         if (txData && callback) callback(txData);
         if (opts.test) return txData;

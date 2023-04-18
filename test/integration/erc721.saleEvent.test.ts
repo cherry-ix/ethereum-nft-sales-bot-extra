@@ -50,7 +50,7 @@ describe('ERC721 Integration Test', function () {
 
             if (!tx || !tx.fromAddr || !tx.toAddr) return;
             const [tokenId] = Object.keys(tx.tokens);
-            console.log(`tx`, tx);
+            // console.log(`tx`, tx);
 
             expect(tx.tokens).to.not.be.undefined;
             expect(tx.fromAddr).to.not.be.undefined;
