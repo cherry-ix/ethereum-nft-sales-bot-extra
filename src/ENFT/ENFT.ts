@@ -114,8 +114,9 @@ export class ENFT {
         const { config, options } = await this.init(opts);
 
         if (!opts.test) Logger.consoleLog(this.auth, config, options);
-
+        console.log(`getting txData (execute())`);
         const txData = await execute(config, opts.transactionHash, options);
+        console.log(`txData`, txData);
 
         if (txData && callback) callback(txData);
         if (opts.test) return txData;

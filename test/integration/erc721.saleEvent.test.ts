@@ -18,11 +18,15 @@ describe('ERC721 Integration Test', function () {
             const bayc = '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d';
             const txHash =
                 '0xb648b7e773cf4267e10bae2f3502cd7df5a9542af5cd65f6d7f167ed84ba0b6c';
+            // const rsop = '0xb159f1a0920a7f1d336397a52d92da94b1279838';
+            // const txHash =
+            //     '0x36b8286b3d42019e98cfcf334578c4ce01ea6d63e7011679c4801e01d58abade';
             const salesData = await client.debugTransaction({
                 test: true,
                 transactionHash: txHash,
                 contractAddress: bayc
             });
+            // console.log(`salesData`, salesData);
 
             assert.strictEqual(salesData, null);
         });
@@ -32,17 +36,21 @@ describe('ERC721 Integration Test', function () {
 
     describe('opensea sale event with fulfillBasicOrder', function () {
         it('should get the correct sales data', async function () {
-            const bayc = '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d';
+            // const bayc = '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d';
+            // const txHash =
+            //     '0xfd859948fcefe8ccb68a76fb18cc5c6bada9b117767b6bfa8280233b8567dbae';
+            const rsop = '0xb159f1a0920a7f1d336397a52d92da94b1279838';
             const txHash =
-                '0xfd859948fcefe8ccb68a76fb18cc5c6bada9b117767b6bfa8280233b8567dbae';
+                '0x36b8286b3d42019e98cfcf334578c4ce01ea6d63e7011679c4801e01d58abade';
             const tx = await client.debugTransaction({
                 test: true,
                 transactionHash: txHash,
-                contractAddress: bayc
+                contractAddress: rsop
             });
 
             if (!tx || !tx.fromAddr || !tx.toAddr) return;
             const [tokenId] = Object.keys(tx.tokens);
+            console.log(`tx`, tx);
 
             expect(tx.tokens).to.not.be.undefined;
             expect(tx.fromAddr).to.not.be.undefined;
@@ -55,19 +63,19 @@ describe('ERC721 Integration Test', function () {
             assert.strictEqual(tx.contractData.tokenType, 'ERC721');
             assert.strictEqual(
                 tx.fromAddr,
-                '0xd7236C5F78DFc0B1467d7809b99B393C9f5b6832'
+                '0x6F69F79cEA418024b9E0acfD18bD8DE26f9BBE39'
             );
             assert.strictEqual(
                 tx.toAddr,
-                '0x605d36F54546eaC8318deA61670e48db3A071A36'
+                '0xED93ef3745c23B94879092a3eC7939Cf6ceac990'
             );
-            assert.strictEqual(tokenId, '5075');
-            assert.strictEqual(formatPrice(tx.totalPrice), '82');
-            assert.strictEqual(tx.currency.name, 'WETH');
+            assert.strictEqual(tokenId, '4122');
+            assert.strictEqual(formatPrice(tx.totalPrice), '0.018');
+            assert.strictEqual(tx.currency.name, 'ETH');
             assert.strictEqual(tx.totalAmount, 1);
-            assert.strictEqual(tx.contractAddress, bayc);
+            assert.strictEqual(tx.contractAddress, rsop);
             assert.strictEqual(tx.transactionHash, txHash);
-            assert.strictEqual(tx.interactedMarket.name, 'opensea');
+            assert.strictEqual(tx.interactedMarket.name, 'blur');
         });
     });
 

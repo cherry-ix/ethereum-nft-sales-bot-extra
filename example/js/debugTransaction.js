@@ -35,7 +35,8 @@ const twitterConfig = {
     appKey: process.env.TWITTER_API_KEY,
     appSecret: process.env.TWITTER_API_SECRET,
     accessToken: process.env.TWITTER_API_ACCESS_TOKEN,
-    accessSecret: process.env.TWITTER_API_ACCESS_SECRET
+    accessSecret: process.env.TWITTER_API_ACCESS_SECRET,
+    tweetWatermark: ''
 };
 
 // Etherscan api key is optional for enabling eth to usd conversion
